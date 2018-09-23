@@ -2,19 +2,17 @@
 // ATmega328P_DoorAlarm
 // Dillon Mills
 
-//const byte interruptPin = 2;
-
-#define FOSC 16000000 // Clock Speed
-#define BAUD 1200 // Baud Rate
-const unsigned int MYUBRR = FOSC/16/BAUD-1;
+const unsigned long int FOSC = 16000000;          // Clock Speed (need data type for this)
+const unsigned short int BAUD = 1200;             // Baud Rate
 
 void setup()
 {
-  // ---------- Debug ---------- //
+  // ---------- Serial ---------- //
   
   // Set baud rate
-  UBRR0H = (unsigned char)(MYUBRR >> 8);
-  UBRR0L = (unsigned char)MYUBRR;
+  unsigned short int ubrr = (FOSC / (16 * BAUD)) - 1;
+  UBRR0H = (unsigned char)(ubrr >> 8);
+  UBRR0L = (unsigned char)ubrr;
   // Enable receiver and transmitter
   UCSR0B = (1 << RXEN0) | (1 << TXEN0);
   // Set frame format: 8data, 2stop bit
@@ -72,5 +70,11 @@ void loop()
 
 ISR(INT0_vect)
 {
-  // <Add door alarm interrupt stuff here.>
+  Serial.print("Alert: Door Activity");
+  // <Add door sensor interrupt stuff here.>
 }
+
+/*ISR(timer)
+{
+  // <Add door timer interrupt stuff here.>
+}*/
