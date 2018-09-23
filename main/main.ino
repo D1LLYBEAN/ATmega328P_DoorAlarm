@@ -60,6 +60,14 @@ void setup()
   // <Add more interrupt stuff here.>
   
   Serial.print("COMPLETE\n");
+
+  // ---------- Power ---------- //
+
+  Serial.print("Setup: Power...");
+
+  // <Add power stuff here.>
+
+  Serial.print("COMPLETE\n");
 }
 
 void loop()
