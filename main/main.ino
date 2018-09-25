@@ -103,7 +103,19 @@ ISR(INT0_vect) // PD2
   Serial.print("Alert: Door Activity - ");
   // <Add door sensor interrupt stuff here.>
   // Read PINxn?
-  Serial.println(PIND);
+  
+  if((PIND & 4) > 0)
+  {
+    // Do something
+    Serial.print("PIND2 = ");
+    Serial.println(PIND & 4);
+    // activate timer, or just sound alarm, or whatever.
+  }
+  else
+  {
+    Serial.print("PIND2 = 0\n");
+    // reset timer
+  }
 }
 
 /*ISR(timer)
