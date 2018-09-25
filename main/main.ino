@@ -40,6 +40,15 @@ void setup()
   //CLKPR |= (0 << CLKPS3) | (0 << CLKPS2) | (0 << CLKPS1) | (0 << CLKPS0); //         1 | 8000.00 kHz |
 
   Serial.print("COMPLETE\n");
+
+  // ---------- Pins ---------- //
+
+  Serial.print("Setup: Pins...");
+
+  DDRD = (1 << DDD2); // set PIND2 as input.
+  PORTD = (1 << PORTD2); // enable PIND2 pull-up.
+
+  Serial.print("COMPLETE\n");
   
   // ---------- Timer ---------- //
   
@@ -52,6 +61,19 @@ void setup()
   // ---------- Interrupts ---------- //
   
   Serial.print("Setup: Interrupts...");
+
+  // # EICRA - External Interrupt Control Register A
+  // ISC1n: Interrupt Sense Control 1 [n = 1:0]
+  // ISC0n: Interrupt Sense Control 0 [n = 1:0]
+  //EICRA = (0 << ISC01) | (0 << ISC00); // The low level of INT0 generates an interrupt request.
+  EICRA = (0 << ISC01) | (1 << ISC00); // Any logical change on INT0 generates an interrupt request.
+  //EICRA = (1 << ISC01) | (0 << ISC00); // The falling edge of INT0 generates an interrupt request.
+  //EICRA = (1 << ISC01) | (1 << ISC00); // The rising edge of INT0 generates an interrupt request.
+
+  // # EIMSK - External Interrupt Mask Register
+  // INT1: External Interrupt Request 1 Enable
+  // INT0: External Interrupt Request 0 Enable
+  EIMSK = (1 << INT0);
   
   // # SREG - AVR Status Register
   // BIT7 (I): Global Interrupt Enable
@@ -76,10 +98,12 @@ void loop()
   delay(1000);
 }
 
-ISR(INT0_vect)
+ISR(INT0_vect) // PD2
 {
-  Serial.print("Alert: Door Activity");
+  Serial.print("Alert: Door Activity - ");
   // <Add door sensor interrupt stuff here.>
+  // Read PINxn?
+  Serial.println(PIND);
 }
 
 /*ISR(timer)
