@@ -54,7 +54,38 @@ void setup()
   
   Serial.print("Setup: Timer...");
 
-  // <Add timer stuff here.>
+  // # TCCR0A - TC0 Control Register A
+  // COM0An: Compare Output Mode for Channel A [n = 1:0]
+  // COM0Bn: Compare Output Mode for Channel B [n = 1:0]
+  // WGM0n: Waveform Generation Mode [n = 1:0]
+  //                                      Mode | WGM02 | WGM01 | WGM00 | Timer/Counter Mode of Operation | TOP  | Update of OCR0x at | TOV Flag Set on
+  TCCR0A = (0 << WGM01) | (0 << WGM00); // 0    | 0     | 0     | 0     | Normal                          | 0xFF | Immediate          | 0xFF
+
+  // # TCCR0B - TC0 Control Register B
+  // FOC0A: Force Output Compare A
+  // FOC0B: Force Output Compare B
+  // WGM02: Waveform Generation Mode
+  // CS0[2:0]: Clock Select 0 [n = 0..2]
+  TCCR0B = (0 << WGM02); // see TCCR0A.
+  //                                                   CA02 | CA01 | CS00 | Clock              | Description
+  TCCR0B |= (0 <<CS02) | (0 << CS01) | (0 << CS00); // 0    | 0    | 0    |     0.000000000 Hz | No clock source (Timer/Counter stopped).
+  //TCCR0B |= (0 <<CS02) | (0 << CS01) | (1 << CS00); // 0    | 0    | 1    | 31250.000000000 Hz | clkIO / 1 (No prescaling)
+  //TCCR0B |= (0 <<CS02) | (1 << CS01) | (0 << CS00); // 0    | 1    | 0    |  3906.250000000 Hz | clkIO / 8 (From prescaler)
+  //TCCR0B |= (0 <<CS02) | (1 << CS01) | (1 << CS00); // 0    | 1    | 1    |   488.281250000 Hz | clkIO / 64 (From prescaler)
+  //TCCR0B |= (1 <<CS02) | (0 << CS01) | (0 << CS00); // 1    | 0    | 0    |   122.070312500 Hz | clkIO / 256 (From prescaler)
+  //TCCR0B |= (1 <<CS02) | (0 << CS01) | (1 << CS00); // 1    | 0    | 1    |    30.517578125 Hz | clkIO / 1024 (From prescaler)
+
+  // # TCNT0 - TC0 Counter Value Register
+  // TCNT0[7:0]: TC0 Counter Value
+  TCNT0 = 0;
+
+  // # OCR0A - TC0 Output Compare Register A
+  // OCR0A[7:0]: Output Compare 0 A
+  OCR0A = 0;
+
+  // # OCR0B - TC0 Output Compare Register B
+  // OCR0B[7:0]: Output Compare 0 B
+  OCR0B = 0;
   
   Serial.print("COMPLETE\n");
   
@@ -74,6 +105,12 @@ void setup()
   // INT1: External Interrupt Request 1 Enable
   // INT0: External Interrupt Request 0 Enable
   EIMSK = (1 << INT0);
+
+  // # TIMSK0 - TC0 Interrupt Mask Register
+  // BIT2: OCIEB: Timer/Counter0, Output Compare B Match Interrupt Enable
+  // BIT1: OCIEA: Timer/Counter0, Output Compare A Match Interrupt Enable
+  // BIT0: TOIE: Timer/Counter0, Overflow Interrupt Enable
+  TIMSK0 = (0 << 2) | (0 << 1) | (1 << 0);
   
   // # SREG - AVR Status Register
   // BIT7 (I): Global Interrupt Enable
@@ -118,7 +155,7 @@ ISR(INT0_vect) // PD2
   }
 }
 
-/*ISR(timer)
+/*ISR(TOV0_vect)
 {
   // <Add door timer interrupt stuff here.>
 }*/
